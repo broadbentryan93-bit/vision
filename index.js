@@ -14,6 +14,7 @@ const {
   EmbedBuilder,
   StringSelectMenuBuilder,
   ChannelType,
+  ActivityType,
 } = require('discord.js');
 
 const EPHEMERAL = 64;
@@ -189,9 +190,18 @@ async function registerCommands() {
 /* ===================== READY ===================== */
 client.once('clientReady', async () => {
   console.log('Bot Ready');
-  await registerCommands().catch((e) => console.error('Command register failed:', e));
-  await restorePanelsFromApi().catch((e) => console.error('Panel restore failed:', e));
+
+  client.user.setPresence({
+    activities: [
+      { name: 'Vision Scripts', type: ActivityType.Watching }
+    ],
+    status: 'online', // online | idle | dnd | invisible
+  });
+
+  await registerCommands().catch(console.error);
+  await restorePanelsFromApi().catch(console.error);
 });
+
 
 /* ===================== INTERACTIONS ===================== */
 client.on('interactionCreate', async (interaction) => {
@@ -650,3 +660,4 @@ process.on('unhandledRejection', (e) => console.error('unhandledRejection:', e))
 process.on('uncaughtException', (e) => console.error('uncaughtException:', e));
 
 client.login(process.env.DISCORD_TOKEN);
+
