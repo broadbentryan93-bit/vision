@@ -72,17 +72,39 @@ async function sendGuildLog(interaction, message) {
 async function registerCommands() {
   const commands = [
 
-    new SlashCommandBuilder().setName('banip').setDescription('Ban IP')
-      .addStringOption(o=>o.setName('ip').setDescription('IP').setRequired(true))
-      .addStringOption(o=>o.setName('reason').setDescription('Reason'))
-      .addStringOption(o=>o.setName('script_id').setDescription('Script UUID'))
-      .addBooleanOption(o=>o.setName('global').setDescription('Global')),
+    new SlashCommandBuilder()
+    .setName('banip')
+    .setDescription('Ban IP')
+      .addStringOption(o=>o
+        .setName('ip')
+        .setDescription('IP')
+        .setRequired(true))
+      .addStringOption(o=>o
+        .setName('reason')
+        .setDescription('Reason'))
+      .addStringOption(o=>o
+        .setName('script_id')
+        .setDescription('Script UUID'))
+      .addBooleanOption(o=>o
+        .setName('global')
+        .setDescription('Global')),
 
-    new SlashCommandBuilder().setName('banhwid').setDescription('Ban HWID')
-      .addStringOption(o=>o.setName('hwid').setDescription('HWID').setRequired(true))
-      .addStringOption(o=>o.setName('reason').setDescription('Reason'))
-      .addStringOption(o=>o.setName('script_id').setDescription('Script UUID'))
-      .addBooleanOption(o=>o.setName('global').setDescription('Global')),
+    new SlashCommandBuilder()
+    .setName('banhwid')
+    .setDescription('Ban HWID')
+      .addStringOption(o=>o
+        .setName('hwid')
+        .setDescription('HWID')
+        .setRequired(true))
+      .addStringOption(o=>o.
+        setName('reason').
+        setDescription('Reason'))
+      .addStringOption(o=>o.
+        setName('script_id')
+        .setDescription('Script UUID'))
+      .addBooleanOption(o=>o.
+        setName('global').
+        setDescription('Global')),
 
   new SlashCommandBuilder()
   .setName('unbanip')
@@ -108,12 +130,24 @@ new SlashCommandBuilder()
      .setDescription('Global unban')
      .setRequired(false)),
 
-    new SlashCommandBuilder().setName('keysecurity').setDescription('View key security')
-      .addStringOption(o=>o.setName('key').setRequired(true)),
+   new SlashCommandBuilder()
+  .setName('keysecurity')
+  .setDescription('View security information for a key')
+  .addStringOption(o =>
+    o.setName('key')
+     .setDescription('The license key value')
+     .setRequired(true)
+  ),
 
-    new SlashCommandBuilder().setName('iplogs').setDescription('IP logs')
-      .addStringOption(o=>o.setName('key_id').setRequired(true)),
-  ].map(c=>c.toJSON());
+new SlashCommandBuilder()
+  .setName('iplogs')
+  .setDescription('View IP logs for a key id')
+  .addStringOption(o =>
+    o.setName('key_id')
+     .setDescription('UUID of the key')
+     .setRequired(true)
+  ),
+
 
   const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
   await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
@@ -202,4 +236,5 @@ client.on('interactionCreate', async interaction => {
 });
 
 client.login(process.env.DISCORD_TOKEN);
+
 
