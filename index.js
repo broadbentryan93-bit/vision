@@ -73,86 +73,90 @@ async function registerCommands() {
   const commands = [
 
     new SlashCommandBuilder()
-    .setName('banip')
-    .setDescription('Ban IP')
-      .addStringOption(o=>o
-        .setName('ip')
-        .setDescription('IP')
-        .setRequired(true))
-      .addStringOption(o=>o
-        .setName('reason')
-        .setDescription('Reason'))
-      .addStringOption(o=>o
-        .setName('script_id')
-        .setDescription('Script UUID'))
-      .addBooleanOption(o=>o
-        .setName('global')
-        .setDescription('Global')),
+      .setName('banip')
+      .setDescription('Ban an IP address')
+      .addStringOption(o =>
+        o.setName('ip')
+         .setDescription('IP address to ban')
+         .setRequired(true))
+      .addStringOption(o =>
+        o.setName('reason')
+         .setDescription('Reason for ban')
+         .setRequired(false))
+      .addStringOption(o =>
+        o.setName('script_id')
+         .setDescription('Script UUID')
+         .setRequired(false))
+      .addBooleanOption(o =>
+        o.setName('global')
+         .setDescription('Global ban')
+         .setRequired(false)),
 
     new SlashCommandBuilder()
-    .setName('banhwid')
-    .setDescription('Ban HWID')
-      .addStringOption(o=>o
-        .setName('hwid')
-        .setDescription('HWID')
-        .setRequired(true))
-      .addStringOption(o=>o.
-        setName('reason').
-        setDescription('Reason'))
-      .addStringOption(o=>o.
-        setName('script_id')
-        .setDescription('Script UUID'))
-      .addBooleanOption(o=>o.
-        setName('global').
-        setDescription('Global')),
+      .setName('banhwid')
+      .setDescription('Ban an HWID')
+      .addStringOption(o =>
+        o.setName('hwid')
+         .setDescription('HWID string')
+         .setRequired(true))
+      .addStringOption(o =>
+        o.setName('reason')
+         .setDescription('Reason for ban')
+         .setRequired(false))
+      .addStringOption(o =>
+        o.setName('script_id')
+         .setDescription('Script UUID')
+         .setRequired(false))
+      .addBooleanOption(o =>
+        o.setName('global')
+         .setDescription('Global ban')
+         .setRequired(false)),
 
-  new SlashCommandBuilder()
-  .setName('unbanip')
-  .setDescription('Unban an IP address')
-  .addStringOption(o =>
-    o.setName('ip')
-     .setDescription('IP address to unban')
-     .setRequired(true))
-  .addBooleanOption(o =>
-    o.setName('global')
-     .setDescription('Global unban')
-     .setRequired(false)),
+    new SlashCommandBuilder()
+      .setName('unbanip')
+      .setDescription('Unban an IP address')
+      .addStringOption(o =>
+        o.setName('ip')
+         .setDescription('IP address to unban')
+         .setRequired(true))
+      .addBooleanOption(o =>
+        o.setName('global')
+         .setDescription('Global unban')
+         .setRequired(false)),
 
-new SlashCommandBuilder()
-  .setName('unbanhwid')
-  .setDescription('Unban an HWID')
-  .addStringOption(o =>
-    o.setName('hwid')
-     .setDescription('HWID string to unban')
-     .setRequired(true))
-  .addBooleanOption(o =>
-    o.setName('global')
-     .setDescription('Global unban')
-     .setRequired(false)),
+    new SlashCommandBuilder()
+      .setName('unbanhwid')
+      .setDescription('Unban an HWID')
+      .addStringOption(o =>
+        o.setName('hwid')
+         .setDescription('HWID to unban')
+         .setRequired(true))
+      .addBooleanOption(o =>
+        o.setName('global')
+         .setDescription('Global unban')
+         .setRequired(false)),
 
-   new SlashCommandBuilder()
-  .setName('keysecurity')
-  .setDescription('View security information for a key')
-  .addStringOption(o =>
-    o.setName('key')
-     .setDescription('The license key value')
-     .setRequired(true)
-  ),
+    new SlashCommandBuilder()
+      .setName('keysecurity')
+      .setDescription('View security info for a key')
+      .addStringOption(o =>
+        o.setName('key')
+         .setDescription('License key')
+         .setRequired(true)),
 
-new SlashCommandBuilder()
-  .setName('iplogs')
-  .setDescription('View IP logs for a key id')
-  .addStringOption(o =>
-    o.setName('key_id')
-     .setDescription('UUID of the key')
-     .setRequired(true)
-  ),
+    new SlashCommandBuilder()
+      .setName('iplogs')
+      .setDescription('View IP logs for a key id')
+      .addStringOption(o =>
+        o.setName('key_id')
+         .setDescription('Key UUID')
+         .setRequired(true))
 
+  ].map(c => c.toJSON());
 
   const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
   await rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands });
 }
-
 /* ===================== READY ===================== */
 client.once('clientReady', async () => {
   client.user.setPresence({
@@ -236,5 +240,6 @@ client.on('interactionCreate', async interaction => {
 });
 
 client.login(process.env.DISCORD_TOKEN);
+
 
 
