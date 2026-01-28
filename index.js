@@ -84,13 +84,29 @@ async function registerCommands() {
       .addStringOption(o=>o.setName('script_id').setDescription('Script UUID'))
       .addBooleanOption(o=>o.setName('global').setDescription('Global')),
 
-    new SlashCommandBuilder().setName('unbanip').setDescription('Unban IP')
-      .addStringOption(o=>o.setName('ip').setRequired(true))
-      .addBooleanOption(o=>o.setName('global')),
+  new SlashCommandBuilder()
+  .setName('unbanip')
+  .setDescription('Unban an IP address')
+  .addStringOption(o =>
+    o.setName('ip')
+     .setDescription('IP address to unban')
+     .setRequired(true))
+  .addBooleanOption(o =>
+    o.setName('global')
+     .setDescription('Global unban')
+     .setRequired(false)),
 
-    new SlashCommandBuilder().setName('unbanhwid').setDescription('Unban HWID')
-      .addStringOption(o=>o.setName('hwid').setRequired(true))
-      .addBooleanOption(o=>o.setName('global')),
+new SlashCommandBuilder()
+  .setName('unbanhwid')
+  .setDescription('Unban an HWID')
+  .addStringOption(o =>
+    o.setName('hwid')
+     .setDescription('HWID string to unban')
+     .setRequired(true))
+  .addBooleanOption(o =>
+    o.setName('global')
+     .setDescription('Global unban')
+     .setRequired(false)),
 
     new SlashCommandBuilder().setName('keysecurity').setDescription('View key security')
       .addStringOption(o=>o.setName('key').setRequired(true)),
@@ -186,3 +202,4 @@ client.on('interactionCreate', async interaction => {
 });
 
 client.login(process.env.DISCORD_TOKEN);
+
