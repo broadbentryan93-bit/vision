@@ -562,16 +562,35 @@ await sendGuildLog(interaction, `📦 Script delivered to <@${interaction.user.i
 return interaction.editReply(loader);
       }
 
-      if (interaction.customId === 'stats') {
-        const stats = await api(`/user/stats?script=${encodeURIComponent(script)}`, 'GET', interaction.user.id);
-        if (!stats?.success) return interaction.editReply('❌ Failed to fetch stats.');
+     if (interaction.customId === 'stats') {
+  const stats = await api(`/user/stats?script=${encodeURIComponent(script)}`, 'GET', interaction.user.id);
+  const access = await api(`/user/access?script=${encodeURIComponent(script)}`, 'GET', interaction.user.id);
 
-        await logEvent('stats_viewed', interaction.user.id, script);
-        return interaction.editReply(
-          `Total: ${stats.stats.total_executions}\nSuccess: ${stats.stats.successful_executions}\nActive keys: ${stats.stats.active_keys}`,
-        );
+  if (!stats?.success) return interaction.editReply('❌ Failed to fetch stats.');
+
+  const embed = new EmbedBuilder()
+    .setTitle(`📊 ${script} Stats`)
+    .setColor('#ff00ff')
+    .addFields(
+      { name: 'Executions', value: String(stats.stats.total_executions), inline: true },
+      { name: 'Success', value: String(stats.stats.successful_executions), inline: true },
+      { name: 'Active Keys', value: String(stats.stats.active_keys), inline: true },
+      {
+        name: 'Your Key',
+        value: access?.key_used ? `\`\`\`${access.key_used}\`\`\`` : 'No key linked',
+        inline: false
+      },
+      {
+        name: 'Access Type',
+        value: access?.access_type || 'unknown',
+        inline: true
       }
+    )
+    .setFooter({ text: `User: ${interaction.user.username}` });
 
+  await logEvent('stats_viewed', interaction.user.id, script);
+  return interaction.editReply({ embeds: [embed] });
+}
       if (interaction.customId === 'hwid') {
         const res = await api('/user/reset-hwid', 'POST', interaction.user.id, { script });
         if (!res?.success) return interaction.editReply('❌ HWID reset failed.');
@@ -660,4 +679,5 @@ process.on('unhandledRejection', (e) => console.error('unhandledRejection:', e))
 process.on('uncaughtException', (e) => console.error('uncaughtException:', e));
 
 client.login(process.env.DISCORD_TOKEN);
+
 
