@@ -679,23 +679,54 @@ client.on('interactionCreate', async (interaction) => {
         return interaction.reply({ content: '❌ This panel is not registered. Recreate it with /panel.', flags: EPHEMERAL });
       }
 
-      // Handle immediate replies first
       if (interaction.customId === 'getrole') {
-        const roleId = panelRoleMap.get(messageId);
-        if (!roleId) {
-          return interaction.reply({ content: '❌ No role configured for this panel.', flags: EPHEMERAL });
-        }
+  const roleId = panelRoleMap.get(messageId);
+  if (!roleId) {
+    return interaction.reply({ content: '❌ No role configured for this panel.', flags: EPHEMERAL });
+  }
 
-        try {
-          await interaction.member.roles.add(roleId);
-          await logEvent('panel_role_granted', interaction.user.id, script, { role_id: roleId });
-          await sendGuildLog(interaction, `🎖️ Role granted to <@${interaction.user.id}> (**${script}**)`);
-          return interaction.reply({ content: '✅ Role granted.', flags: EPHEMERAL });
-        } catch (error) {
-          console.error('Role assignment error:', error);
-          return interaction.reply({ content: '❌ Failed to assign role. Check bot permissions.', flags: EPHEMERAL });
-        }
-      }
+  // 🔍 Check user access
+  const access = await api(`/user/access?script=${encodeURIComponent(script)}`, 'GET', interaction.user.id);
+
+  if (!access?.success) {
+    return interaction.reply({ content: '❌ Failed to verify access.', flags: EPHEMERAL });
+  }
+
+  /* ================= KEYLESS SCRIPTS ================= */
+  if (access.access_type === 'keyless') {
+    // allow role for keyless scripts
+    try {
+      await interaction.member.roles.add(roleId);
+      await logEvent('panel_role_granted', interaction.user.id, script, { role_id: roleId, type: 'keyless' });
+      await sendGuildLog(interaction, `🎖️ Keyless role granted to <@${interaction.user.id}> (**${script}**)`);
+      return interaction.reply({ content: '✅ Role granted.', flags: EPHEMERAL });
+    } catch {
+      return interaction.reply({ content: '❌ Bot lacks role permissions.', flags: EPHEMERAL });
+    }
+  }
+
+  /* ================= KEY SYSTEM SCRIPTS ================= */
+  if (!access.has_access || !access.key_used) {
+    return interaction.reply({
+      content: '🔑 You must redeem a valid key before receiving this role.',
+      flags: EPHEMERAL
+    });
+  }
+
+  /* ================= USER HAS KEY ================= */
+  try {
+    await interaction.member.roles.add(roleId);
+    await logEvent('panel_role_granted', interaction.user.id, script, {
+      role_id: roleId,
+      key_used: access.key_used
+    });
+    await sendGuildLog(interaction, `🎖️ Role granted to <@${interaction.user.id}> (**${script}**)`);
+    return interaction.reply({ content: '✅ Role granted.', flags: EPHEMERAL });
+  } catch (error) {
+    console.error('Role assignment error:', error);
+    return interaction.reply({ content: '❌ Failed to assign role. Check bot role hierarchy.', flags: EPHEMERAL });
+  }
+}
 
       if (interaction.customId === 'redeem') {
         // Check if script is keyless
@@ -858,3 +889,4 @@ process.on('unhandledRejection', (e) => console.error('unhandledRejection:', e))
 process.on('uncaughtException', (e) => console.error('uncaughtException:', e));
 
 client.login(process.env.DISCORD_TOKEN);
+
